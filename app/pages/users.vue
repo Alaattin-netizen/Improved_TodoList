@@ -14,7 +14,6 @@ const {
   updateModalOpen,
   selectedUserId,
   newTaskText,
-
   taskColumns,
 
   getTasksForUser,

@@ -1,28 +1,43 @@
 <script setup lang="ts">
-import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
-import { useClipboard } from '@vueuse/core'
-import { h, resolveComponent } from 'vue'
+import type {
+  ContextMenuItem,
+  TableColumn,
+} from '@nuxt/ui'
+
+import { useTaskActions } from '~/composables/helper'
+
+const taskStore = useTaskStore()
+const userStore = useUserStore()
+
+const {
+  updateModalOpen,
+  newTaskText,
+  getTaskRowItems,
+  updateTask,
+} = useTaskActions()
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
-const taskStore = useTaskStore()
-const userStore = useUserStore()
-const { copy } = useClipboard()
 
 const createModalOpen = ref(false)
-const updateModalOpen = ref(false)
+const selectedUserId = ref<number | null>(null)
+
 const toast = useToast()
-const selectedTaskId = ref<number>()
-const newTaskText = ref('')
-const selectedUserId = ref<number>()
 
 const tasksWithUsers = computed(() => {
   return taskStore.taskList.map(task => ({
     ...task,
-    userName: userStore.getUserById(task.userId)?.name || '—',
+    userName:
+      userStore.getUserById(task.userId)?.name ?? '—',
   }))
 })
+
+function openCreateModal() {
+  newTaskText.value = ''
+  selectedUserId.value = null
+  createModalOpen.value = true
+}
 
 const taskColumns: TableColumn<Task>[] = [
   { accessorKey: 'id', header: 'ID' },
@@ -76,68 +91,19 @@ const taskColumns: TableColumn<Task>[] = [
   },
 ]
 
-const items = ref<ContextMenuItem[]>([])
-
-function getTaskRowItems(row: TableRow<Task>) {
-  return [
-    {
-      type: 'label' as const,
-      label: 'Actions',
-    },
-    {
-      label: 'Copy Task ID',
-      onSelect() {
-        copy(String(row.original.id))
-
-        toast.add({
-          title: 'Task ID copied to clipboard!',
-          color: 'success',
-          icon: 'i-lucide-circle-check',
-        })
-      },
-    },
-    {
-      label: 'Delete Task',
-      onSelect() {
-        taskStore.deleteTask(row.original.id)
-      },
-    },
-    {
-      label: row.original.completed ? 'Change to Pendind' : 'Change to completed',
-      onSelect() {
-        taskStore.toggleTask(row.original.id)
-      },
-    },
-    { label: 'Update Task', onSelect() {
-      selectedTaskId.value = row.original.id
-      newTaskText.value = ''
-      updateModalOpen.value = true
-    } },
-
-  ]
-}
-
-function updateTask() {
-  if (selectedTaskId.value != null && newTaskText.value.trim()) {
-    taskStore.updateTask(selectedTaskId.value, newTaskText.value.trim())
-    updateModalOpen.value = false
-    toast.add({
-      title: 'Task updated!',
-      color: 'success',
-      icon: 'i-lucide-check',
-    })
-  }
-}
-
-function openCreateModal() {
-  newTaskText.value = ''
-  createModalOpen.value = true
-}
 function createTask() {
-  if (selectedUserId.value != null && newTaskText.value.trim()) {
+  if (
+    selectedUserId.value !== null
+    && newTaskText.value.trim()
+  ) {
     if (userStore.getUserById(selectedUserId.value)) {
-      taskStore.addTask(newTaskText.value.trim(), selectedUserId.value)
+      taskStore.addTask(
+        newTaskText.value.trim(),
+        selectedUserId.value,
+      )
+
       createModalOpen.value = false
+
       toast.add({
         title: 'Task added!',
         color: 'success',
@@ -148,11 +114,13 @@ function createTask() {
       toast.add({
         title: 'User ID does not exist!',
         color: 'warning',
-        icon: 'i-lucide-check',
+        icon: 'i-lucide-circle-check',
       })
     }
   }
 }
+
+const items = ref<ContextMenuItem[]>([])
 
 onMounted(() => {
   userStore.fetchUsers()
