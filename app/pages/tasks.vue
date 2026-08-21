@@ -2,6 +2,8 @@
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import { useClipboard } from '@vueuse/core'
 import { h, resolveComponent } from 'vue'
+import { useTaskStore } from '~/stores/task'
+import { useUserStore } from '~/stores/user'
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')

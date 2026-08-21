@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import { useClipboard } from '@vueuse/core'
+
 import { h, resolveComponent } from 'vue'
+
+import { useTaskStore } from '~/stores/task'
+import { useUserStore } from '~/stores/user'
 
 const userStore = useUserStore()
 const taskStore = useTaskStore()
@@ -96,7 +100,7 @@ function getTaskRowItems(row: TableRow<Task>) {
       },
     },
     {
-      label: row.original.completed ? 'Change to Pendind' : 'Change to completed',
+      label: row.original.completed ? 'Change to Pending' : 'Change to completed',
       onSelect() {
         taskStore.toggleTask(row.original.id)
       },
