@@ -19,6 +19,8 @@
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^9.3.0",
+    "eslint": "^10.8.0",
     "eslint-plugin-antfu": "^3.2.3",
     "vite-tsconfig-paths": "^6.1.1"
   }

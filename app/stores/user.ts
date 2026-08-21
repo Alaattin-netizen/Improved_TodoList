@@ -1,4 +1,3 @@
-
 export const useUserStore = defineStore('users', () => {
   const users = ref<User[]>([])
 
@@ -8,8 +7,9 @@ export const useUserStore = defineStore('users', () => {
       if (stored) {
         try {
           users.value = JSON.parse(stored)
-          return true 
-        } catch (e) {
+          return true
+        }
+        catch (e) {
           console.warn('Failed to parse users from localStorage', e)
         }
       }
@@ -24,23 +24,24 @@ export const useUserStore = defineStore('users', () => {
   }
 
   async function fetchUsers() {
-    if (users.value.length) return
+    if (users.value.length)
+      return
 
-    if (loadFromLocalStorage()) return
+    if (loadFromLocalStorage())
+      return
 
-   
     try {
       const data = await $fetch<User[]>('https://jsonplaceholder.typicode.com/users')
       users.value = data.map(({ id, name, username, email }) => ({
-      id,
-      name,
-      username,
-      email,
-    }))
-      saveToLocalStorage() 
-    } catch (error) {
+        id,
+        name,
+        username,
+        email,
+      }))
+      saveToLocalStorage()
+    }
+    catch (error) {
       console.error('Failed to load users:', error)
-    } finally {
     }
   }
 
@@ -52,11 +53,16 @@ export const useUserStore = defineStore('users', () => {
     }
   }
 
+  function getUserById(id: number) {
+    return users.value.find(u => u.id === id)
+  }
+
   return {
     users,
     fetchUsers,
     loadFromLocalStorage,
     saveToLocalStorage,
     updateUser,
+    getUserById,
   }
 })

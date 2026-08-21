@@ -10,10 +10,12 @@ export const useTaskStore = defineStore('task', () => {
           taskList.value = JSON.parse(stored)
           if (taskList.value.length > 0) {
             nextId.value = Math.max(...taskList.value.map(t => t.id)) + 1
-          } else {
+          }
+          else {
             nextId.value = 1
           }
-        } catch (e) {
+        }
+        catch (e) {
           console.warn('Failed to parse tasks', e)
           taskList.value = []
           nextId.value = 1
@@ -33,7 +35,7 @@ export const useTaskStore = defineStore('task', () => {
       id: nextId.value++,
       text,
       completed: false,
-      createdAt: new Date(),
+      createdAt: new Date().toLocaleDateString(),
       userId,
     })
     saveTasks()

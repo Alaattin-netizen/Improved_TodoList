@@ -5,6 +5,6 @@ declare global {
     userId: number
     text: string
     completed: boolean
-    createdAt: Date
+    createdAt: string
   }
 }
